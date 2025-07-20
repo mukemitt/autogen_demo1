@@ -9,7 +9,7 @@ load_dotenv()
 config_list = [
     {
         "model": "gpt-3.5-turbo",
-        "api_key": os.getenv("OPENAI_API_KEY"),
+        "api_key": os.environ.get("OPENAI_API_KEY"),
     }
 ]
 
@@ -24,8 +24,8 @@ def main():
     user_proxy = autogen.UserProxyAgent(
         name="UserProxy",
         system_message="A human admin who will provide the task and manage the conversation.",
-        code_execution_config={"last_n_messages": 2, "work_dir": "coding"},
-        human_input_mode="TERMINATE",
+        code_execution_config={"last_n_messages": 2, "work_dir": "coding", "use_docker": False},
+        human_input_mode="ALWAYS",
     )
 
     # Create an AssistantAgent (AI assistant)
@@ -40,6 +40,7 @@ def main():
         agents=[user_proxy, assistant],
         messages=[],
         max_round=10,
+        speaker_selection_method="round_robin",
     )
 
     manager = autogen.GroupChatManager(
